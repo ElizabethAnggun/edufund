@@ -1,0 +1,47 @@
+<?php
+
+use App\Enums\BlockchainNetwork;
+use App\Enums\BlockchainTransactionStatus;
+use App\Enums\BlockchainTransactionType;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('blockchain_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('transactionable');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('tx_hash')->unique();
+            $table->string('type');
+            $table->decimal('amount', 15, 2);
+            $table->string('currency')->default('XLM');
+            $table->string('from_address');
+            $table->string('to_address');
+            $table->string('status')->default(BlockchainTransactionStatus::PENDING->value);
+            $table->string('network')->default(BlockchainNetwork::TESTNET->value);
+            $table->text('error_message')->nullable();
+            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamps();
+
+            $table->index(['transactionable_id', 'transactionable_type']);
+            $table->index('user_id');
+            $table->index('status');
+            $table->index('network');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('blockchain_transactions');
+    }
+};

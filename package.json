@@ -8,9 +8,11 @@
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.1",
+        "alpinejs": "^3.14.7",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
+        "lucide-static": "^0.469.0",
         "tailwindcss": "^4.3.1",
         "vite": "^7.0.7"
     }
