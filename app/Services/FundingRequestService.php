@@ -7,6 +7,7 @@ use App\Enums\FundingRequestStatus;
 use App\Models\FundingRequest;
 use App\Models\StudentProfile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class FundingRequestService implements FundingRequestServiceInterface
 {
@@ -62,5 +63,33 @@ class FundingRequestService implements FundingRequestServiceInterface
         ]);
 
         return $request;
+    }
+
+    public function approve(FundingRequest $request): FundingRequest
+    {
+        return DB::transaction(function () use ($request) {
+            $request->update([
+                'status' => FundingRequestStatus::APPROVED,
+                'approved_at' => now(),
+                'rejected_at' => null,
+                'rejection_reason' => null,
+            ]);
+
+            return $request;
+        });
+    }
+
+    public function reject(FundingRequest $request, string $reason): FundingRequest
+    {
+        return DB::transaction(function () use ($request, $reason) {
+            $request->update([
+                'status' => FundingRequestStatus::REJECTED,
+                'rejected_at' => now(),
+                'approved_at' => null,
+                'rejection_reason' => $reason,
+            ]);
+
+            return $request;
+        });
     }
 }

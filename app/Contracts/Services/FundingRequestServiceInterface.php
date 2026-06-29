@@ -13,4 +13,6 @@ interface FundingRequestServiceInterface
     public function update(FundingRequest $request, array $data): FundingRequest;
     public function delete(FundingRequest $request): bool;
     public function submit(FundingRequest $request): FundingRequest;
+    public function approve(FundingRequest $request): FundingRequest;
+    public function reject(FundingRequest $request, string $reason): FundingRequest;
 }

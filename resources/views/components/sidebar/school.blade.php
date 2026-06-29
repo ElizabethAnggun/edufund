@@ -8,5 +8,8 @@
         <a href="{{ route('school.dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md {{ request()->routeIs('school.dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
             <span class="font-medium">Dashboard</span>
         </a>
+        <a href="{{ route('school.funding-requests.index') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md {{ request()->routeIs('school.funding-requests.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+            <span class="font-medium">Funding Requests</span>
+        </a>
     </nav>
 </aside>
