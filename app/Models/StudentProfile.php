@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EducationLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,13 +16,17 @@ class StudentProfile extends Model
     protected $fillable = [
         'user_id',
         'school_id',
+        'profile_photo',
+        'nisn',
         'nim',
+        'education_level',
         'major',
         'semester',
         'gpa',
         'date_of_birth',
         'phone',
         'address',
+        'bio',
         'student_id_card',
     ];
 
@@ -30,6 +35,7 @@ class StudentProfile extends Model
         return [
             'date_of_birth' => 'date',
             'gpa' => 'decimal:2',
+            'education_level' => EducationLevel::class,
         ];
     }
 

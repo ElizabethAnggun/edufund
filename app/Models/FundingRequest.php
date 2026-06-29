@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FundingCategory;
 use App\Enums\FundingRequestStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +22,8 @@ class FundingRequest extends Model
         'description',
         'total_amount',
         'currency',
+        'deadline',
+        'funding_category',
         'purpose',
         'status',
         'submitted_at',
@@ -34,6 +37,8 @@ class FundingRequest extends Model
         return [
             'total_amount' => 'decimal:2',
             'status' => FundingRequestStatus::class,
+            'funding_category' => FundingCategory::class,
+            'deadline' => 'date',
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
@@ -58,5 +63,10 @@ class FundingRequest extends Model
     public function milestones(): HasMany
     {
         return $this->hasMany(Milestone::class);
+    }
+
+    public function supportingDocuments(): HasMany
+    {
+        return $this->hasMany(SupportingDocument::class);
     }
 }
