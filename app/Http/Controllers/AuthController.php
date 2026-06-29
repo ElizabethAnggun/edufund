@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\Services\AuthServiceInterface;
-use App\Enums\UserRole;
 use App\Http\Requests\LoginRequest;
+use App\Support\RoleRedirect;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,16 +29,19 @@ class AuthController extends Controller
 
         if ($this->authService->login($credentials, $remember)) {
             $request->session()->regenerate();
-            $user = Auth::user();
-            if ($user->hasRole(UserRole::ADMIN->value)) {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->hasRole(UserRole::STUDENT->value)) {
-                return redirect()->route('student.dashboard');
-            } elseif ($user->hasRole(UserRole::SCHOOL->value)) {
-                return redirect()->route('school.dashboard');
-            } elseif ($user->hasRole(UserRole::DONOR->value)) {
-                return redirect()->route('donor.dashboard');
+
+            $redirect = RoleRedirect::toDashboard(Auth::user());
+            if ($redirect) {
+                return $redirect;
             }
+
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'email' => 'Your account has no assigned role. Please contact the administrator.',
+            ])->onlyInput('email');
         }
 
         return back()->withErrors([
