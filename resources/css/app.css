@@ -1,11 +1,189 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Typography */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+    /* Brand Colors - Orange Theme */
+    --color-primary: #E25B24;       
+    --color-primary-hover: #F28C28; 
+    --color-primary-active: #C84A1B;
+    
+    /* Soft backgrounds for orange theme */
+    --color-primary-soft: #FFF4ED;  
+    --color-primary-subtle: #FFFBF7;
+
+    /* Semantic Colors */
+    --color-success: #16A34A;       
+    --color-warning: #F59E0B;       
+    --color-error: #EF4444;         
+
+    /* ADDED: Missing Web3 & Polygon Colors */
+    --color-polygon: #8B5CF6;
+    --color-web3: #3B82F6;
+
+    /* Neutrals - Clean White/Gray Scale */
+    --color-background: #FFFFFF;
+    --color-surface: #FFFFFF;
+    --color-surface-warm: #FAFAFA;  
+    
+    --color-border: #E5E7EB;
+    --color-border-light: #F3F4F6;
+
+    --color-text: #111827;          
+    --color-text-secondary: #4B5563; 
+    --color-text-muted: #6B7280;     
+
+    /* Shadows & Radius */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+}
+
+/* Base Styles */
+html { 
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--color-background);
+    color: var(--color-text);
+    overflow-x: hidden;
+    line-height: 1.6;
+    top: 0px !important;
+}
+
+/* Custom Utilities (Tailwind v4 properly handles @utility) */
+@utility text-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@utility bg-brand-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+}
+
+@utility glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+/* Card Components */
+@utility card {
+    background: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-2xl);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        border-color: var(--color-border);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+}
+
+@utility card-elevated {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-border);
+
+    &:hover {
+        box-shadow: var(--shadow-xl);
+    }
+}
+
+/* Animations */
+@utility animate-float { 
+    animation: float 6s ease-in-out infinite; 
+}
+
+@utility animate-blob { 
+    animation: blob 15s ease-in-out infinite; 
+}
+
+@utility animate-ping {
+    animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* Focus States for Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+::selection {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+a, button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Google Translate Header Fix */
+#google_translate_element { display: flex; align-items: center; min-width: auto; }
+#google_translate_element select { font-size: 12px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--color-border-light); background: white; color: var(--color-text-secondary); cursor: pointer; min-width: auto; font-family: var(--font-sans); }
+.goog-te-gadget { font-size: 12px !important; line-height: 1 !important; }
+.goog-te-gadget-simple { border: none !important; border-radius: 6px !important; padding: 4px 8px !important; background: white !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
+.goog-te-gadget-simple .goog-te-menu-value { color: var(--color-text-secondary) !important; font-size: 12px !important; }
+.goog-te-gadget-simple img { display: none !important; }
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+    body { font-size: 14px; }
+}
+
+/* Print Styles */
+@media print {
+    header, footer, .no-print { display: none !important; }
+    body { background: white; }
+    .card { break-inside: avoid; page-break-inside: avoid; }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .card { border-width: 2px; }
+    .text-gradient { -webkit-text-fill-color: var(--color-primary); }
 }
