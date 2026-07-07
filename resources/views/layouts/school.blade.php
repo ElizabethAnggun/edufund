@@ -6,16 +6,16 @@
     <title>{{ config('app.name', 'EduFund') }} - @yield('title')</title>
     @include('partials.vite-assets')
 </head>
-<body class="bg-gray-100 min-h-screen flex">
+<body class="bg-background min-h-screen flex">
     <x-sidebar.school />
     <div class="flex-1 flex flex-col">
-        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-gray-800">@yield('page-title')</h1>
+        <header class="bg-surface shadow-sm border-b border-neutral-200 p-4 flex items-center justify-between">
+            <h1 class="text-xl font-semibold text-neutral-900">@yield('page-title')</h1>
             <div class="flex items-center gap-4">
-                <span class="text-gray-600">{{ auth()->user()->name }}</span>
+                <span class="text-neutral-700">{{ auth()->user()->name }}</span>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                    <button type="submit" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-all btn-press">Logout</button>
                 </form>
             </div>
         </header>
@@ -41,6 +41,13 @@
             @endif
             @yield('content')
         </main>
+        <footer class="bg-neutral-900 text-neutral-400 text-center text-xs py-4 px-6">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <span class="badge-circle w-5 h-5 text-xs font-bold">E</span>
+                <span class="font-semibold text-sm text-white">EduFund</span>
+            </div>
+            <p>&copy; {{ date('Y') }} EduFund Inc. All rights reserved.</p>
+        </footer>
     </div>
 </body>
 </html>

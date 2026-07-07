@@ -6,20 +6,21 @@
     <title>@yield('title', config('app.name', 'EduFund'))</title>
     @include('partials.vite-assets')
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-        <a href="{{ route('login') }}" class="flex items-center justify-center mb-6 text-2xl font-bold text-blue-600">
+<body class="bg-background min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md p-8 bg-surface rounded-2xl shadow-lg border border-neutral-200">
+        <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 mb-6 text-2xl font-bold text-primary">
+            <span class="badge-circle w-9 h-9 text-lg">E</span>
             {{ config('app.name', 'EduFund') }}
         </a>
 
         @if (session('status'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
+            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-xl">
                 {{ session('status') }}
             </div>
         @endif
 
         @if (session('success'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
+            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-xl">
                 {{ session('success') }}
             </div>
         @endif
