@@ -2,20 +2,44 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Contracts\Services\StudentDashboardServiceInterface;
 use App\Http\Controllers\Controller;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly StudentDashboardServiceInterface $dashboardService
+    ) {}
+
     public function index(): View
     {
-        $user = auth()->user();
-        $profile = $user->studentProfile;
-        $profileComplete = $profile && $profile->nisn && $profile->phone && $profile->address;
-        $fundingRequests = $profile ? $profile->fundingRequests : collect();
-        $draftCount = $fundingRequests->where('status', \App\Enums\FundingRequestStatus::DRAFT)->count();
-        $submittedCount = $fundingRequests->where('status', \App\Enums\FundingRequestStatus::PENDING_SCHOOL_APPROVAL)->count();
+        $student = auth()->user()->studentProfile;
 
-        return view('student.dashboard', compact('profile', 'profileComplete', 'fundingRequests', 'draftCount', 'submittedCount'));
+        if (!$student) {
+            return view('student.dashboard', [
+                'student' => null,
+                'stats' => [],
+                'fundingProgress' => [],
+                'milestoneProgress' => [],
+                'recentFundingRequests' => collect(),
+                'recentActivities' => collect(),
+            ]);
+        }
+
+        $stats = $this->dashboardService->getStatistics($student);
+        $fundingProgress = $this->dashboardService->getFundingProgress($student);
+        $milestoneProgress = $this->dashboardService->getMilestoneProgress($student);
+        $recentFundingRequests = $this->dashboardService->getRecentFundingRequests($student, 5);
+        $recentActivities = $this->dashboardService->getRecentActivities($student, 10);
+
+        return view('student.dashboard', compact(
+            'student',
+            'stats',
+            'fundingProgress',
+            'milestoneProgress',
+            'recentFundingRequests',
+            'recentActivities'
+        ));
     }
 }
