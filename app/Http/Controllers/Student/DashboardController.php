@@ -42,4 +42,35 @@ class DashboardController extends Controller
             'recentActivities'
         ));
     }
+
+    public function profile(): View
+    {
+        $student = auth()->user()->studentProfile;
+        return view('student.profile', compact('student'));
+    }
+
+    public function achievements(): View
+    {
+        $student = auth()->user()->studentProfile;
+        $achievements = $student ? $student->achievements : collect();
+        return view('student.achievements', compact('achievements'));
+    }
+
+    public function notifications(): View
+    {
+        $user = auth()->user();
+        $notifications = $user->notifications()->paginate(20);
+        return view('student.notifications', compact('notifications'));
+    }
+
+    public function settings(): View
+    {
+        $settings = [
+            'email_notifications' => true,
+            'milestone_reminders' => true,
+            'newsletter' => false,
+            'profile_public' => true,
+        ];
+        return view('student.settings', compact('settings'));
+    }
 }

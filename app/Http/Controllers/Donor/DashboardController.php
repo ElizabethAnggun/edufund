@@ -31,4 +31,28 @@ class DashboardController extends Controller
             'totalDonationAmount'
         ));
     }
+
+    public function wallet(): View
+    {
+        $user = auth()->user();
+        $balance = $user->donations()->where('status', 'completed')->sum('amount');
+        $walletAddress = $user->wallet_address;
+        return view('donor.wallet', compact('balance', 'walletAddress'));
+    }
+
+    public function notifications(): View
+    {
+        $user = auth()->user();
+        $notifications = collect(); // Placeholder
+        return view('donor.notifications', compact('notifications'));
+    }
+
+    public function settings(): View
+    {
+        $settings = [
+            'email_notifications' => true,
+            'marketing_emails' => false,
+        ];
+        return view('donor.settings', compact('settings'));
+    }
 }

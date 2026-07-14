@@ -5,7 +5,7 @@ use App\Http\Controllers\Donor\CampaignController;
 use App\Http\Controllers\Donor\DonationController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:donor'])->prefix('donor')->name('donor.')->group(function () {
+Route::middleware(['auth', 'role:donor'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Browse Campaigns

@@ -37,4 +37,18 @@ class DashboardController extends Controller
             'recentActivities'
         ));
     }
+
+    public function students(): View
+    {
+        $school = auth()->user()->school;
+        $students = $school ? $this->dashboardService->getStudentList($school) : collect();
+        return view('school.students.index', compact('students'));
+    }
+
+    public function verifications(): View
+    {
+        $school = auth()->user()->school;
+        $verifications = $school ? $this->dashboardService->getVerificationHistory($school) : collect();
+        return view('school.verifications.index', compact('verifications'));
+    }
 }
