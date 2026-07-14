@@ -5,7 +5,7 @@ use App\Http\Controllers\Student\FundingRequestController;
 use App\Http\Controllers\Student\MilestoneController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
+Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Profile
@@ -38,3 +38,4 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     // Settings
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
 });
+

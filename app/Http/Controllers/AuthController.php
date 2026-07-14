@@ -28,13 +28,15 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if ($this->authService->login($credentials, $remember)) {
-            $request->session()->regenerate();
+            // Session regeneration is handled by Auth::attempt()
+            // No need to manually regenerate here
 
             $redirect = RoleRedirect::toDashboard(Auth::user());
             if ($redirect) {
                 return $redirect;
             }
 
+            // User has no role, log them out
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
