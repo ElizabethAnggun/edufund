@@ -97,6 +97,20 @@ class FundingRequestController extends Controller
             ->with('success', 'Document uploaded successfully.');
     }
 
+    public function documents(): View
+    {
+        $student = auth()->user()->studentProfile;
+        $documents = collect();
+        if ($student) {
+            $fundingRequests = $this->fundingRequestService->getAllByStudent($student);
+            foreach ($fundingRequests as $request) {
+                $requestDocuments = $this->supportingDocumentService->getAllByFundingRequest($request);
+                $documents = $documents->merge($requestDocuments);
+            }
+        }
+        return view('student.documents', compact('documents'));
+    }
+
     public function deleteDocument(FundingRequest $fundingRequest, \App\Models\SupportingDocument $document): RedirectResponse
     {
         $this->authorize('update', $fundingRequest);

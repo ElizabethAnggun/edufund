@@ -24,6 +24,9 @@ class DashboardController extends Controller
                 'milestoneProgress' => [],
                 'recentFundingRequests' => collect(),
                 'recentActivities' => collect(),
+                'walletBalance' => 0,
+                'notificationCount' => 0,
+                'currentMilestone' => null,
             ]);
         }
 
@@ -32,6 +35,9 @@ class DashboardController extends Controller
         $milestoneProgress = $this->dashboardService->getMilestoneProgress($student);
         $recentFundingRequests = $this->dashboardService->getRecentFundingRequests($student, 5);
         $recentActivities = $this->dashboardService->getRecentActivities($student, 10);
+        $walletBalance = $this->dashboardService->getWalletBalance($student);
+        $notificationCount = $this->dashboardService->getNotificationCount($student);
+        $currentMilestone = $this->dashboardService->getCurrentMilestone($student);
 
         return view('student.dashboard', compact(
             'student',
@@ -39,7 +45,10 @@ class DashboardController extends Controller
             'fundingProgress',
             'milestoneProgress',
             'recentFundingRequests',
-            'recentActivities'
+            'recentActivities',
+            'walletBalance',
+            'notificationCount',
+            'currentMilestone'
         ));
     }
 
@@ -51,8 +60,8 @@ class DashboardController extends Controller
 
     public function achievements(): View
     {
-        $student = auth()->user()->studentProfile;
-        $achievements = $student ? $student->achievements : collect();
+        $user = auth()->user();
+        $achievements = $user->achievements()->latest('issued_at')->get();
         return view('student.achievements', compact('achievements'));
     }
 
@@ -61,6 +70,24 @@ class DashboardController extends Controller
         $user = auth()->user();
         $notifications = $user->notifications()->paginate(20);
         return view('student.notifications', compact('notifications'));
+    }
+
+    public function wallet(): View
+    {
+        $user = auth()->user();
+        $wallet = [
+            'address' => 'GDET7Q23J45H...', // Dummy address
+            'balance' => 0, // Dummy balance
+            'network' => 'Stellar',
+        ];
+        $transactions = collect(); // Dummy transactions
+        return view('student.wallet', compact('wallet', 'transactions'));
+    }
+
+    public function transactions(): View
+    {
+        $transactions = collect(); // Dummy transactions
+        return view('student.transactions', compact('transactions'));
     }
 
     public function settings(): View
@@ -72,5 +99,11 @@ class DashboardController extends Controller
             'profile_public' => true,
         ];
         return view('student.settings', compact('settings'));
+    }
+
+    public function updateSettings(): \Illuminate\Http\RedirectResponse
+    {
+        // Dummy implementation
+        return redirect()->route('student.settings')->with('success', 'Settings updated successfully!');
     }
 }

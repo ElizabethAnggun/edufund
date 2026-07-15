@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class School extends Model
 {
@@ -32,6 +33,12 @@ class School extends Model
             'verified_at' => 'datetime',
             'verification_status' => SchoolVerificationStatus::class,
         ];
+    }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        // For now, use default avatar - can later add school logo field if needed!
+        return asset('images/default-avatar.svg');
     }
 
     public function user(): BelongsTo

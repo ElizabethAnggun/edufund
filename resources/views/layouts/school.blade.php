@@ -13,6 +13,7 @@
             <h1 class="text-xl font-semibold text-neutral-900">@yield('page-title')</h1>
             <div class="flex items-center gap-4">
                 <span class="text-neutral-700">{{ auth()->user()->name }}</span>
+                <img src="{{ auth()->user()->school?->avatar_url ?? asset('images/default-avatar.svg') }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-neutral-200">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-all btn-press">Logout</button>

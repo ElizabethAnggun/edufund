@@ -89,15 +89,15 @@ class SchoolDashboardService implements SchoolDashboardServiceInterface
         return $activities;
     }
 
-    public function getStudentList(School $school, int $perPage = 10): Collection
+    public function getStudentList(School $school, int $perPage = 10): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $school->studentProfiles()
-            ->with('user')
+            ->with(['user', 'fundingRequests'])
             ->latest()
             ->paginate($perPage);
     }
 
-    public function getVerificationHistory(School $school, int $perPage = 10): Collection
+    public function getVerificationHistory(School $school, int $perPage = 10): \Illuminate\Pagination\LengthAwarePaginator
     {
         return Verification::where('verifiable_type', School::class)
             ->where('verifiable_id', $school->id)

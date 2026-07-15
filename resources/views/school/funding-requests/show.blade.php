@@ -49,21 +49,29 @@
         </div>
 
         @if($fundingRequest->status === \App\Enums\FundingRequestStatus::PENDING_SCHOOL_APPROVAL)
-            <div class="flex gap-4">
-                <form action="{{ route('school.funding-requests.approve', $fundingRequest) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-full transition-all btn-press" onclick="return confirm('Approve this funding request?')">
-                        Approve Request
-                    </button>
-                </form>
-                <form action="{{ route('school.funding-requests.reject', $fundingRequest) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-full transition-all" onclick="return confirm('Reject this funding request?')">
-                        Reject Request
-                    </button>
-                </form>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-background p-5 rounded-xl">
+                    <form action="{{ route('school.funding-requests.approve', $fundingRequest) }}" method="POST">
+                        @csrf
+                        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Approve Request</h3>
+                        <button type="submit" class="w-full px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-full transition-all btn-press" onclick="return confirm('Approve this funding request?')">
+                            Approve Request
+                        </button>
+                    </form>
+                </div>
+                <div class="bg-background p-5 rounded-xl">
+                    <form action="{{ route('school.funding-requests.reject', $fundingRequest) }}" method="POST">
+                        @csrf
+                        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Reject Request</h3>
+                        <div class="mb-4">
+                            <label class="block text-neutral-700 font-medium mb-2 text-sm">Rejection Reason</label>
+                            <textarea name="rejection_reason" rows="3" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="Enter rejection reason (minimum 10 characters)" required>{{ old('rejection_reason') }}</textarea>
+                        </div>
+                        <button type="submit" class="w-full px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-full transition-all btn-press" onclick="return confirm('Reject this funding request?')">
+                            Reject Request
+                        </button>
+                    </form>
+                </div>
             </div>
         @endif
     </div>

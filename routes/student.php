@@ -3,13 +3,15 @@
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\FundingRequestController;
 use App\Http\Controllers\Student\MilestoneController;
+use App\Http\Controllers\Student\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Profile
-    Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'store'])->name('profile.store');
     
     // Funding Requests
     Route::get('/funding-requests', [FundingRequestController::class, 'index'])->name('funding-requests.index');
@@ -19,23 +21,33 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/funding-requests/{fundingRequest}/edit', [FundingRequestController::class, 'edit'])->name('funding-requests.edit');
     Route::put('/funding-requests/{fundingRequest}', [FundingRequestController::class, 'update'])->name('funding-requests.update');
     Route::delete('/funding-requests/{fundingRequest}', [FundingRequestController::class, 'destroy'])->name('funding-requests.destroy');
+    Route::post('/funding-requests/{fundingRequest}/submit', [FundingRequestController::class, 'submit'])->name('funding-requests.submit');
+    Route::post('/funding-requests/{fundingRequest}/documents', [FundingRequestController::class, 'uploadDocument'])->name('funding-requests.documents.upload');
+    Route::delete('/funding-requests/{fundingRequest}/documents/{document}', [FundingRequestController::class, 'deleteDocument'])->name('funding-requests.documents.delete');
     
     // Milestones
     Route::get('/milestones', [MilestoneController::class, 'index'])->name('milestones.index');
     Route::get('/milestones/{milestone}', [MilestoneController::class, 'show'])->name('milestones.show');
     Route::post('/milestones/{milestone}/submit', [MilestoneController::class, 'submit'])->name('milestones.submit');
     
-    // Supporting Documents
-    Route::get('/documents', [FundingRequestController::class, 'documents'])->name('documents.index');
+    // My Documents
+    Route::get('/documents', [FundingRequestController::class, 'documents'])->name('documents');
     Route::post('/documents/upload', [FundingRequestController::class, 'uploadDocument'])->name('documents.upload');
     
     // Achievements
     Route::get('/achievements', [DashboardController::class, 'achievements'])->name('achievements.index');
     
     // Notifications
-    Route::get('/notifications', [DashboardController::class, 'notifications'])->name('notifications.index');
+    Route::get('/notifications', [DashboardController::class, 'notifications'])->name('notifications');
+    
+    // Wallet
+    Route::get('/wallet', [DashboardController::class, 'wallet'])->name('wallet');
+    
+    // Transactions
+    Route::get('/transactions', [DashboardController::class, 'transactions'])->name('transactions');
     
     // Settings
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    Route::put('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
 });
 

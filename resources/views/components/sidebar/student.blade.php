@@ -15,5 +15,23 @@
         <a href="{{ route('student.funding-requests.index') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.funding-requests.*') ? 'bg-primary-soft text-primary' : '' }}">
             Funding Requests
         </a>
+        <a href="{{ route('student.milestones.index') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.milestones.*') ? 'bg-primary-soft text-primary' : '' }}">
+            Milestones
+        </a>
+        <a href="{{ route('student.documents') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.documents') ? 'bg-primary-soft text-primary' : '' }}">
+            My Documents
+        </a>
+        <a href="{{ route('student.wallet') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.wallet') ? 'bg-primary-soft text-primary' : '' }}">
+            Wallet
+        </a>
+        <a href="{{ route('student.transactions') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.transactions') ? 'bg-primary-soft text-primary' : '' }}">
+            Transactions
+        </a>
+        <a href="{{ route('student.notifications') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.notifications') ? 'bg-primary-soft text-primary' : '' }}">
+            Notifications
+        </a>
+        <a href="{{ route('student.settings') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('student.settings') ? 'bg-primary-soft text-primary' : '' }}">
+            Settings
+        </a>
     </nav>
 </aside>

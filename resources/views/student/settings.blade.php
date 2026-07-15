@@ -15,7 +15,7 @@
         <div class="bg-surface p-8 rounded-xl border border-neutral-200">
             <h3 class="text-xl font-semibold text-neutral-900 mb-6">Account Settings</h3>
             
-            <form action="{{ route('student.settings') }}" method="POST">
+            <form action="{{ route('student.settings.update') }}" method="POST">
                 @csrf
                 @method('PUT')
 

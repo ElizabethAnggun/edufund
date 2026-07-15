@@ -4,9 +4,6 @@ namespace App\Services;
 
 use App\Contracts\Services\StudentDashboardServiceInterface;
 use App\Models\StudentProfile;
-use App\Models\FundingRequest;
-use App\Models\MilestoneSubmission;
-use App\Models\Achievement;
 use Illuminate\Support\Collection;
 
 class StudentDashboardService implements StudentDashboardServiceInterface
@@ -16,7 +13,7 @@ class StudentDashboardService implements StudentDashboardServiceInterface
         $totalFundingRequests = $student->fundingRequests()->count();
         $approvedFundingRequests = $student->fundingRequests()->where('status', 'approved')->count();
         $totalMilestones = $student->milestoneSubmissions()->count();
-        $completedMilestones = $student->milestoneSubmissions()->where('status', 'approved')->count();
+        $completedMilestones = $student->milestoneSubmissions()->where('status', \App\Enums\MilestoneSubmissionStatus::VERIFIED->value)->count();
 
         return [
             'total_funding_requests' => $totalFundingRequests,
@@ -47,7 +44,7 @@ class StudentDashboardService implements StudentDashboardServiceInterface
             'total_goal' => $totalGoal,
             'total_raised' => $totalRaised,
             'progress_percentage' => $progressPercentage,
-            'active_campaigns' => $fundingRequests->where('campaign.status', 'active')->count(),
+            'active_campaigns' => $fundingRequests->filter(fn($req) => $req->campaign && $req->campaign->status === 'active')->count(),
         ];
     }
 
@@ -64,11 +61,11 @@ class StudentDashboardService implements StudentDashboardServiceInterface
             });
 
         $completedMilestones = $student->milestoneSubmissions()
-            ->where('status', 'approved')
+            ->where('status', \App\Enums\MilestoneSubmissionStatus::VERIFIED->value)
             ->count();
 
         $pendingMilestones = $student->milestoneSubmissions()
-            ->where('status', 'pending')
+            ->where('status', \App\Enums\MilestoneSubmissionStatus::PENDING->value)
             ->count();
 
         $progressPercentage = $totalMilestones > 0 ? round(($completedMilestones / $totalMilestones) * 100, 2) : 0;
@@ -124,19 +121,22 @@ class StudentDashboardService implements StudentDashboardServiceInterface
             });
 
         // Achievement activities
-        $achievementActivities = $student->achievements()
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(function ($achievement) {
-                return [
-                    'id' => $achievement->id,
-                    'type' => 'achievement',
-                    'message' => "You earned the '{$achievement->title}' badge",
-                    'timestamp' => $achievement->created_at,
-                    'status' => 'completed',
-                ];
-            });
+        $achievementActivities = collect();
+        if ($student->user) {
+            $achievementActivities = $student->user->achievements()
+                ->latest('issued_at')
+                ->limit($limit)
+                ->get()
+                ->map(function ($achievement) {
+                    return [
+                        'id' => $achievement->id,
+                        'type' => 'achievement',
+                        'message' => "You earned the '{$achievement->title}' badge",
+                        'timestamp' => $achievement->created_at,
+                        'status' => 'completed',
+                    ];
+                });
+        }
 
         // Merge and sort by timestamp
         $activities = $fundingActivities
@@ -147,6 +147,21 @@ class StudentDashboardService implements StudentDashboardServiceInterface
             ->values();
 
         return $activities;
+    }
+    
+    public function getWalletBalance(StudentProfile $student): float
+    {
+        return 0.00; // Dummy value
+    }
+    
+    public function getNotificationCount(StudentProfile $student): int
+    {
+        return 0; // Dummy value
+    }
+    
+    public function getCurrentMilestone(StudentProfile $student): ?object
+    {
+        return null; // Dummy value
     }
 
     private function calculateProfileCompletion(StudentProfile $student): int

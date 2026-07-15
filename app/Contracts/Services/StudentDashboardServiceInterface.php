@@ -16,4 +16,10 @@ interface StudentDashboardServiceInterface
     public function getRecentFundingRequests(StudentProfile $student, int $limit = 5): Collection;
 
     public function getRecentActivities(StudentProfile $student, int $limit = 10): Collection;
+    
+    public function getWalletBalance(StudentProfile $student): float;
+    
+    public function getNotificationCount(StudentProfile $student): int;
+    
+    public function getCurrentMilestone(StudentProfile $student): ?object;
 }

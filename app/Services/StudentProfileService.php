@@ -27,35 +27,28 @@ class StudentProfileService implements StudentProfileServiceInterface
             $profileData['profile_photo'] = $data['profile_photo']->store('profile_photos', 'public');
         }
 
-        if (isset($data['nisn'])) {
-            $profileData['nisn'] = $data['nisn'];
-        }
-        if (isset($data['education_level'])) {
-            $profileData['education_level'] = $data['education_level'];
-        }
-        if (isset($data['major'])) {
-            $profileData['major'] = $data['major'];
-        }
-        if (isset($data['bio'])) {
-            $profileData['bio'] = $data['bio'];
-        }
-        if (isset($data['phone'])) {
-            $profileData['phone'] = $data['phone'];
-        }
-        if (isset($data['address'])) {
-            $profileData['address'] = $data['address'];
-        }
-        if (isset($data['date_of_birth'])) {
-            $profileData['date_of_birth'] = $data['date_of_birth'];
-        }
-        if (isset($data['gpa'])) {
-            $profileData['gpa'] = $data['gpa'];
-        }
-        if (isset($data['semester'])) {
-            $profileData['semester'] = $data['semester'];
-        }
-        if (isset($data['nim'])) {
-            $profileData['nim'] = $data['nim'];
+        // Shared fields
+        $sharedFields = [
+            'education_level', 'phone', 'address', 'date_of_birth', 'bio', 'parent_name', 'parent_income'
+        ];
+
+        // High school specific fields
+        $highSchoolFields = [
+            'nisn', 'school_name', 'school_npsn', 'school_address', 'major', 'class', 
+            'graduation_year', 'student_status', 'academic_rank'
+        ];
+
+        // University specific fields
+        $universityFields = [
+            'nim', 'university_name', 'university_address', 'faculty', 'study_program', 
+            'semester', 'gpa', 'expected_graduation', 'scholarship_status'
+        ];
+
+        // Process all fields
+        foreach (array_merge($sharedFields, $highSchoolFields, $universityFields) as $field) {
+            if (isset($data[$field])) {
+                $profileData[$field] = $data[$field];
+            }
         }
 
         if ($user->studentProfile && $user->studentProfile->school_id) {

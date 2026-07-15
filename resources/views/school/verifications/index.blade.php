@@ -49,6 +49,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-6">
+                {{ $verifications->links() }}
+            </div>
         @else
             <div class="text-center py-12">
                 <svg class="w-16 h-16 text-neutral-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

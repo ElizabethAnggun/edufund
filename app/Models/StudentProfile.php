@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EducationLevel;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,11 +24,28 @@ class StudentProfile extends Model
         'major',
         'semester',
         'gpa',
+        'academic_rank',
         'date_of_birth',
         'phone',
         'address',
         'bio',
         'student_id_card',
+        // High School fields
+        'school_name',
+        'school_npsn',
+        'school_address',
+        'class',
+        'graduation_year',
+        'parent_name',
+        'parent_income',
+        'student_status',
+        // University fields
+        'university_name',
+        'university_address',
+        'faculty',
+        'study_program',
+        'expected_graduation',
+        'scholarship_status',
     ];
 
     protected function casts(): array
@@ -35,8 +53,20 @@ class StudentProfile extends Model
         return [
             'date_of_birth' => 'date',
             'gpa' => 'decimal:2',
+            'parent_income' => 'decimal:2',
             'education_level' => EducationLevel::class,
+            'graduation_year' => 'integer',
+            'expected_graduation' => 'date',
         ];
+    }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->profile_photo) {
+            return Storage::url($this->profile_photo);
+        }
+        
+        return asset('images/default-avatar.svg');
     }
 
     public function user(): BelongsTo
