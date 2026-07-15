@@ -47,6 +47,10 @@ return [
 
         // Escrow Smart Contract (deployed on Soroban)
         'escrow_contract_id' => env('STELLAR_ESCROW_CONTRACT_ID', ''),
+
+        // Soroban Admin Account (for contract deployment and management)
+        'soroban_admin_secret_key' => env('SOROBAN_ADMIN_SECRET_KEY', ''),
+        'soroban_admin_public_key' => env('SOROBAN_ADMIN_PUBLIC_KEY', ''),
     ],
 
 ];

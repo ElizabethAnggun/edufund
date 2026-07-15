@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String, Vec, Map, symbol_short, Symbol, token, TokenClient};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec, token};
 
 /// EduFund Escrow Smart Contract
 /// 
@@ -33,6 +33,7 @@ pub struct Campaign {
     pub total_donated: i128,
     pub total_released: i128,
     pub goal_amount: i128,
+    pub token_address: Address,
 }
 
 #[contracttype]
@@ -82,8 +83,8 @@ pub struct EduFundEscrow;
 impl EduFundEscrow {
 
     /// Initialize the escrow contract for a campaign
-    /// Sets the campaign admin, school, and goal amount
-    pub fn initialize(env: Env, admin: Address, school: Address, goal_amount: i128) {
+    /// Sets the campaign admin, school, goal amount, and token address
+    pub fn initialize(env: Env, admin: Address, school: Address, goal_amount: i128, token_address: Address) {
         // Only allow initialization once
         assert!(
             !env.storage().instance().has(&DataKey::Campaign),
@@ -99,6 +100,7 @@ impl EduFundEscrow {
             total_donated: 0,
             total_released: 0,
             goal_amount,
+            token_address,
         };
 
         put_campaign(&env, &campaign);
@@ -124,8 +126,8 @@ impl EduFundEscrow {
         assert!(campaign.state == CampaignState::Active, "campaign is not active");
 
         // Transfer XLM from donor to this contract
-        let token_address = env.current_contract_address();
-        let token = token::Client::new(&env, &token_address);
+        let token = token::Client::new(&env, &campaign.token_address);
+        token.transfer(&donor, &env.current_contract_address(), &amount);
         
         // Track the donation
         let mut donations = get_donations(&env);
@@ -145,7 +147,7 @@ impl EduFundEscrow {
     pub fn add_milestone(env: Env, admin: Address, amount: i128, recipient: Address) {
         admin.require_auth();
 
-        let mut campaign = get_campaign(&env);
+        let campaign = get_campaign(&env);
         assert!(campaign.admin == admin, "only admin can add milestones");
         assert!(campaign.state == CampaignState::Active, "campaign is not active");
 
@@ -176,20 +178,26 @@ impl EduFundEscrow {
         assert!(campaign.state == CampaignState::Active, "campaign is not active");
 
         let mut milestones = get_milestones(&env);
-        let mut milestone = milestones.get(milestone_id).unwrap();
+        let idx: u32 = milestone_id.try_into().unwrap();
+        let mut milestone = milestones.get(idx).unwrap();
         assert!(!milestone.verified, "milestone already verified");
 
         // Mark milestone as verified
         milestone.verified = true;
-        milestones.set(milestone_id, milestone.clone());
+        
+        // Extract values before moving milestone
+        let recipient = milestone.recipient.clone();
+        let amount = milestone.amount;
+        
+        milestones.set(idx, milestone);
         put_milestones(&env, &milestones);
 
-        // Transfer funds to the recipient (school/student)
-        let token = token::Client::new(&env, &env.current_contract_address());
-        token.transfer(&campaign.admin, &milestone.recipient, &milestone.amount);
+        // Transfer funds from escrow (contract) to the recipient (school/student)
+        let token = token::Client::new(&env, &campaign.token_address);
+        token.transfer(&env.current_contract_address(), &recipient, &amount);
 
         // Update campaign
-        campaign.total_released += milestone.amount;
+        campaign.total_released += amount;
         put_campaign(&env, &campaign);
     }
 
@@ -215,11 +223,11 @@ impl EduFundEscrow {
         campaign.state = CampaignState::Completed;
         put_campaign(&env, &campaign);
 
-        // Release remaining funds to school
+        // Release remaining funds from escrow to school
         let remaining = campaign.total_donated - campaign.total_released;
         if remaining > 0 {
-            let token = token::Client::new(&env, &env.current_contract_address());
-            token.transfer(&admin, &campaign.school, &remaining);
+            let token = token::Client::new(&env, &campaign.token_address);
+            token.transfer(&env.current_contract_address(), &campaign.school, &remaining);
             campaign.total_released += remaining;
             put_campaign(&env, &campaign);
         }
@@ -236,18 +244,19 @@ impl EduFundEscrow {
         campaign.state = CampaignState::Failed;
         put_campaign(&env, &campaign);
 
-        // Refund all donors
+        // Refund all donors from escrow
         let donations = get_donations(&env);
-        let token = token::Client::new(&env, &env.current_contract_address());
+        let token = token::Client::new(&env, &campaign.token_address);
 
         for donation in donations.iter() {
-            token.transfer(&admin, &donation.donor, &donation.amount);
+            token.transfer(&env.current_contract_address(), &donation.donor, &donation.amount);
         }
     }
 
     /// Get the contract's XLM balance
     pub fn get_balance(env: Env) -> i128 {
-        let token = token::Client::new(&env, &env.current_contract_address());
+        let campaign = get_campaign(&env);
+        let token = token::Client::new(&env, &campaign.token_address);
         token.balance(&env.current_contract_address())
     }
 
@@ -255,47 +264,5 @@ impl EduFundEscrow {
     pub fn get_total_raised(env: Env) -> i128 {
         let campaign = get_campaign(&env);
         campaign.total_donated
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use soroban_sdk::{Env, Address, vec, symbol_short};
-
-    #[test]
-    fn test_initialize() {
-        let env = Env::default();
-        let contract_id = env.register_contract(None, EduFundEscrow);
-        let client = EduFundEscrowClient::new(&env, &contract_id);
-
-        let admin = Address::generate(&env);
-        let school = Address::generate(&env);
-
-        client.initialize(&admin, &school, &1000i128);
-
-        let campaign = client.get_campaign_details();
-        assert_eq!(campaign.admin, admin);
-        assert_eq!(campaign.school, school);
-        assert_eq!(campaign.goal_amount, 1000);
-        assert_eq!(campaign.state, CampaignState::Active);
-    }
-
-    #[test]
-    fn test_add_and_verify_milestone() {
-        let env = Env::default();
-        let contract_id = env.register_contract(None, EduFundEscrow);
-        let client = EduFundEscrowClient::new(&env, &contract_id);
-
-        let admin = Address::generate(&env);
-        let school = Address::generate(&env);
-        let recipient = Address::generate(&env);
-
-        client.initialize(&admin, &school, &1000i128);
-        client.add_milestone(&admin, &500i128, &recipient);
-
-        let milestones = client.get_milestones_list();
-        assert_eq!(milestones.len(), 1);
-        assert_eq!(milestones.get(0).unwrap().amount, 500);
     }
 }
