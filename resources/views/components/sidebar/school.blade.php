@@ -9,6 +9,9 @@
         <a href="{{ route('school.dashboard') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('school.dashboard') ? 'bg-primary-soft text-primary' : '' }}">
             Dashboard
         </a>
+        <a href="{{ route('school.profile') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('school.profile') ? 'bg-primary-soft text-primary' : '' }}">
+            Profile
+        </a>
         <a href="{{ route('school.students.index') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('school.students.*') ? 'bg-primary-soft text-primary' : '' }}">
             Students
         </a>

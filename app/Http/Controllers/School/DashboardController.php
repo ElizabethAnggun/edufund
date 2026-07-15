@@ -5,6 +5,7 @@ namespace App\Http\Controllers\School;
 use App\Contracts\Services\SchoolDashboardServiceInterface;
 use App\Enums\FundingRequestStatus;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -13,17 +14,12 @@ class DashboardController extends Controller
         private readonly SchoolDashboardServiceInterface $dashboardService
     ) {}
 
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $school = auth()->user()->school;
         
         if (!$school) {
-            return view('school.dashboard', [
-                'school' => null,
-                'stats' => [],
-                'recentFundingRequests' => collect(),
-                'recentActivities' => collect(),
-            ]);
+            return redirect()->route('school.profile')->with('warning', 'Please complete your school profile first.');
         }
 
         $stats = $this->dashboardService->getStatistics($school);
@@ -38,17 +34,27 @@ class DashboardController extends Controller
         ));
     }
 
-    public function students(): View
+    public function students(): View|RedirectResponse
     {
         $school = auth()->user()->school;
-        $students = $school ? $this->dashboardService->getStudentList($school) : collect();
+        
+        if (!$school) {
+            return redirect()->route('school.profile')->with('warning', 'Please complete your school profile first.');
+        }
+        
+        $students = $this->dashboardService->getStudentList($school);
         return view('school.students.index', compact('students'));
     }
 
-    public function verifications(): View
+    public function verifications(): View|RedirectResponse
     {
         $school = auth()->user()->school;
-        $verifications = $school ? $this->dashboardService->getVerificationHistory($school) : collect();
+        
+        if (!$school) {
+            return redirect()->route('school.profile')->with('warning', 'Please complete your school profile first.');
+        }
+        
+        $verifications = $this->dashboardService->getVerificationHistory($school);
         return view('school.verifications.index', compact('verifications'));
     }
 }

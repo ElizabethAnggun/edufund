@@ -18,11 +18,15 @@ class School extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'npsn',
         'address',
+        'headmaster_name',
         'phone',
         'email',
+        'logo',
         'accreditation_number',
         'accreditation_document',
+        'stellar_wallet_address',
         'verification_status',
         'verified_at',
     ];
@@ -35,10 +39,17 @@ class School extends Model
         ];
     }
 
+    public function getLogoUrlAttribute(): string
+    {
+        if ($this->logo) {
+            return Storage::url($this->logo);
+        }
+        return asset('images/default-avatar.svg');
+    }
+
     public function getAvatarUrlAttribute(): string
     {
-        // For now, use default avatar - can later add school logo field if needed!
-        return asset('images/default-avatar.svg');
+        return $this->logo_url;
     }
 
     public function user(): BelongsTo
