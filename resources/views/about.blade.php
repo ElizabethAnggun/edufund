@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'EduFund') }} - About Us</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Google Translate Widget -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 
 <body class="antialiased bg-background text-neutral-900">
@@ -24,6 +36,7 @@
                     <a href="{{ route('about') }}" class="nav-link text-primary font-semibold transition">About</a>
                 </div>
                 <div class="hidden md:flex items-center gap-4">
+                    <div id="google_translate_element" class="text-sm"></div>
                     @auth
                         <a href="{{ url('/dashboard') }}" class="nav-link">Dashboard</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -49,6 +62,9 @@
                 <a href="/#scholarships" @click="open=false" class="block nav-link">Scholarships</a>
                 <a href="{{ route('about') }}" @click="open=false" class="block nav-link text-primary">About</a>
                 <hr>
+                <div class="pb-4">
+                    <div id="google_translate_element_mobile" class="text-sm"></div>
+                </div>
                 @auth
                     <a href="{{ url('/dashboard') }}" class="block nav-link">Dashboard</a>
                     <form method="POST" action="{{ route('logout') }}">

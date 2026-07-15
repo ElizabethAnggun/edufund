@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Models\StudentProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -157,6 +158,44 @@ class AuthenticationTest extends TestCase
             ->get(route('donor.dashboard'))
             ->assertOk()
             ->assertSee('Donor Dashboard');
+    }
+
+    public function test_student_dashboard_renders_when_student_profile_is_missing(): void
+    {
+        $student = $this->createUserWithRole(UserRole::STUDENT);
+
+        $this->actingAs($student)
+            ->get(route('student.dashboard'))
+            ->assertOk()
+            ->assertSee('Student Dashboard')
+            ->assertSee('Student Profile Not Complete');
+    }
+
+    public function test_student_dashboard_renders_when_student_profile_exists(): void
+    {
+        $student = $this->createUserWithRole(UserRole::STUDENT);
+
+        StudentProfile::create([
+            'user_id' => $student->id,
+            'school_id' => null,
+            'nisn' => 'NISN-0001',
+            'nim' => 'NIM-0001',
+            'education_level' => 's1',
+            'major' => 'Computer Science',
+            'semester' => 4,
+            'gpa' => 3.75,
+            'date_of_birth' => '2004-01-01',
+            'phone' => '08123456789',
+            'address' => 'Jl. Testing No. 1',
+            'bio' => 'Student dashboard test profile.',
+            'student_id_card' => 'card-001.png',
+        ]);
+
+        $this->actingAs($student)
+            ->get(route('student.dashboard'))
+            ->assertOk()
+            ->assertSee('Student Dashboard')
+            ->assertSee('Welcome back');
     }
 
     public function test_login_fails_for_user_without_role(): void
