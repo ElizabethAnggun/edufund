@@ -3,14 +3,24 @@
 namespace App\Services;
 
 use App\Contracts\Services\FundingRequestServiceInterface;
+use App\Contracts\Services\StellarServiceInterface;
+use App\Enums\CampaignStatus;
+use App\Enums\CampaignVisibility;
 use App\Enums\FundingRequestStatus;
+use App\Models\Campaign;
 use App\Models\FundingRequest;
 use App\Models\StudentProfile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class FundingRequestService implements FundingRequestServiceInterface
 {
+    public function __construct(
+        private readonly StellarServiceInterface $stellarService
+    ) {}
+
     public function getAllByStudent(StudentProfile $student, int $perPage = 10): LengthAwarePaginator
     {
         return $student->fundingRequests()->latest()->paginate($perPage);
@@ -25,7 +35,7 @@ class FundingRequestService implements FundingRequestServiceInterface
             'total_amount' => $data['total_amount'],
             'currency' => $data['currency'] ?? 'XLM',
             'deadline' => $data['deadline'],
-            'funding_category' => $data['funding_category'],
+            'category' => $data['category'],
             'purpose' => $data['purpose'] ?? $data['description'],
             'status' => FundingRequestStatus::DRAFT,
         ]);
@@ -38,7 +48,7 @@ class FundingRequestService implements FundingRequestServiceInterface
             'description' => $data['description'] ?? $request->description,
             'total_amount' => $data['total_amount'] ?? $request->total_amount,
             'deadline' => $data['deadline'] ?? $request->deadline,
-            'funding_category' => $data['funding_category'] ?? $request->funding_category,
+            'category' => $data['category'] ?? $request->category,
             'purpose' => $data['purpose'] ?? $data['description'] ?? $request->purpose,
         ]);
 
@@ -70,10 +80,26 @@ class FundingRequestService implements FundingRequestServiceInterface
         return DB::transaction(function () use ($request) {
             $request->update([
                 'status' => FundingRequestStatus::APPROVED,
-                'approved_at' => now(),
+                'school_approved_at' => now(),
                 'rejected_at' => null,
                 'rejection_reason' => null,
             ]);
+
+            $campaign = $this->createCampaignForRequest($request);
+
+            // Create escrow account on Stellar/Soroban for this campaign
+            try {
+                $escrowId = $this->stellarService->createEscrowAccount($campaign);
+                Log::info('Escrow created for campaign', [
+                    'campaign_id' => $campaign->id,
+                    'escrow_id' => $escrowId,
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Escrow creation failed (non-critical)', [
+                    'campaign_id' => $campaign->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             return $request;
         });
@@ -85,11 +111,40 @@ class FundingRequestService implements FundingRequestServiceInterface
             $request->update([
                 'status' => FundingRequestStatus::REJECTED,
                 'rejected_at' => now(),
-                'approved_at' => null,
+                'school_approved_at' => null,
                 'rejection_reason' => $reason,
             ]);
 
             return $request;
         });
+    }
+
+    /**
+     * Create (or return the existing) campaign for an approved funding request.
+     * This links the student's request to a public fundraising campaign owned
+     * by the school, closing the student -> donor transaction loop.
+     * Also creates an escrow account on Stellar/Soroban for transparent fund management.
+     */
+    public function createCampaignForRequest(FundingRequest $request): Campaign
+    {
+        $campaign = Campaign::firstOrCreate(
+            ['funding_request_id' => $request->id],
+            [
+                'school_id' => $request->school_id,
+                'title' => 'Kampanye Bantuan ' . $request->studentProfile->user->name,
+                'slug' => Str::slug(
+                    'kampanye-bantuan-' . $request->studentProfile->user->name . '-' . $request->id
+                ),
+                'description' => 'Bantu ' . $request->studentProfile->user->name
+                    . ' ' . ($request->purpose ?? $request->description),
+                'goal_amount' => $request->total_amount,
+                'current_amount' => 0,
+                'status' => CampaignStatus::ACTIVE,
+                'visibility' => CampaignVisibility::PUBLIC,
+                'published_at' => now(),
+            ]
+        );
+
+        return $campaign;
     }
 }

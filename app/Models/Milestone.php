@@ -55,4 +55,9 @@ class Milestone extends Model
     {
         return $this->hasOne(Achievement::class);
     }
+
+    public function disbursement(): HasOne
+    {
+        return $this->hasOne(Disbursement::class);
+    }
 }

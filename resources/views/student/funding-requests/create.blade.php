@@ -28,9 +28,9 @@
                 </div>
                 <div>
                     <label class="block text-neutral-700 font-medium mb-2">Category</label>
-                    <select name="funding_category" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-white" required>
+                    <select name="category" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-white" required>
                         @foreach(\App\Enums\FundingCategory::cases() as $category)
-                            <option value="{{ $category->value }}" {{ old('funding_category') === $category->value ? 'selected' : '' }}>
+                            <option value="{{ $category->value }}" {{ old('category') === $category->value ? 'selected' : '' }}>
                                 {{ ucwords(str_replace('_', ' ', $category->value)) }}
                             </option>
                         @endforeach

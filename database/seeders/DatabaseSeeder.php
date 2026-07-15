@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
             SchoolSeeder::class,
             StudentSeeder::class,
             DonorSeeder::class,
+            FundingRequestSeeder::class,
+            CampaignSeeder::class,
+            MilestoneSeeder::class,
+            DonationSeeder::class,
+            DisbursementSeeder::class,
         ]);
     }
 }

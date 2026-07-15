@@ -15,24 +15,32 @@ class SchoolDashboardService implements SchoolDashboardServiceInterface
     public function getStatistics(School $school): array
     {
         $totalStudents = $school->studentProfiles()->count();
-        
+
         $pendingFundingRequests = $school->fundingRequests()
             ->where('status', 'pending_school_approval')
             ->count();
-            
+
         $approvedFundingRequests = $school->fundingRequests()
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'active', 'completed'])
             ->count();
-            
+
         $rejectedFundingRequests = $school->fundingRequests()
             ->where('status', 'rejected')
             ->count();
+
+        $totalRaised = (float) $school->campaigns()->sum('current_amount');
+
+        $totalDisbursed = (float) $school->disbursements()
+            ->where('status', 'completed')
+            ->sum('amount');
 
         return [
             'total_students' => $totalStudents,
             'pending_funding_requests' => $pendingFundingRequests,
             'approved_funding_requests' => $approvedFundingRequests,
             'rejected_funding_requests' => $rejectedFundingRequests,
+            'total_raised' => $totalRaised,
+            'total_disbursed' => $totalDisbursed,
         ];
     }
 

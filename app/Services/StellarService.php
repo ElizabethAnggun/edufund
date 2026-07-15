@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Services\StellarServiceInterface;
 use App\Models\Campaign;
+use App\Models\Milestone;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -90,11 +91,6 @@ class StellarService implements StellarServiceInterface
         }
     }
 
-    public function createEscrowAccount(string $campaignId): string
-    {
-        return $this->escrowAccount;
-    }
-
     public function submitTransaction(string $signedXdr): array
     {
         try {
@@ -130,5 +126,55 @@ class StellarService implements StellarServiceInterface
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    // ========================================================================
+    // Stellar Classic (Legacy) - Soroban methods not supported
+    // ========================================================================
+
+    public function createEscrowAccount(Campaign $campaign): string
+    {
+        // Classic Stellar: just return the configured escrow account
+        return $this->escrowAccount;
+    }
+
+    public function depositToEscrow(Campaign $campaign, string $donorPublicKey, float $amount): array
+    {
+        // Classic Stellar: deposit is handled manually by donor via Horizon transaction
+        return [
+            'success' => true,
+            'hash' => null,
+            'error' => null,
+            'note' => 'Classic Stellar: deposit handled via Horizon transaction',
+        ];
+    }
+
+    public function releaseFunds(Campaign $campaign, Milestone $milestone, string $recipientAddress): array
+    {
+        // Classic Stellar: release is not supported via smart contract
+        return [
+            'success' => false,
+            'hash' => null,
+            'error' => 'Classic Stellar does not support smart contract fund releases. Upgrade to Soroban.',
+        ];
+    }
+
+    public function refundDonors(Campaign $campaign): array
+    {
+        // Classic Stellar: refund not supported
+        return [
+            'success' => false,
+            'hash' => null,
+            'error' => 'Classic Stellar does not support smart contract refunds. Upgrade to Soroban.',
+        ];
+    }
+
+    public function getEscrowBalance(Campaign $campaign): float
+    {
+        // Classic Stellar: check the escrow account balance
+        if (!empty($this->escrowAccount)) {
+            return $this->getBalance($this->escrowAccount);
+        }
+        return 0.0;
     }
 }

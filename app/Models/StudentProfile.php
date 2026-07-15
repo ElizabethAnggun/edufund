@@ -88,4 +88,9 @@ class StudentProfile extends Model
     {
         return $this->hasMany(MilestoneSubmission::class);
     }
+
+    public function disbursements(): HasMany
+    {
+        return $this->hasMany(Disbursement::class);
+    }
 }

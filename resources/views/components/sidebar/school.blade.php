@@ -21,5 +21,8 @@
         <a href="{{ route('school.verifications.index') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('school.verifications.*') ? 'bg-primary-soft text-primary' : '' }}">
             Verifications
         </a>
+        <a href="{{ route('school.disbursements.index') }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-primary-soft hover:text-primary rounded-xl transition-colors {{ request()->routeIs('school.disbursements.*') ? 'bg-primary-soft text-primary' : '' }}">
+            Disbursements
+        </a>
     </nav>
 </aside>

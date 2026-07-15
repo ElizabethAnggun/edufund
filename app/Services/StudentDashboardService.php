@@ -2,12 +2,18 @@
 
 namespace App\Services;
 
+use App\Contracts\Services\StellarServiceInterface;
 use App\Contracts\Services\StudentDashboardServiceInterface;
+use App\Models\Donation;
 use App\Models\StudentProfile;
 use Illuminate\Support\Collection;
 
 class StudentDashboardService implements StudentDashboardServiceInterface
 {
+    public function __construct(
+        private readonly StellarServiceInterface $stellarService
+    ) {}
+
     public function getStatistics(StudentProfile $student): array
     {
         $totalFundingRequests = $student->fundingRequests()->count();
@@ -151,14 +157,72 @@ class StudentDashboardService implements StudentDashboardServiceInterface
     
     public function getWalletBalance(StudentProfile $student): float
     {
-        return 0.00; // Dummy value
+        $address = $student->user?->wallet_address;
+
+        if (!$address) {
+            return 0.0;
+        }
+
+        return $this->stellarService->getBalance($address);
     }
-    
+
+    /**
+     * Aggregate the student's real transaction history: donations received
+     * on their campaigns (from donors via the school) and fund releases
+     * disbursed to them by the school.
+     */
+    public function getTransactions(StudentProfile $student): Collection
+    {
+        $donations = Donation::whereHas('campaign.fundingRequest', function ($query) use ($student) {
+                $query->where('student_profile_id', $student->id);
+            })
+            ->with(['campaign.fundingRequest', 'donor', 'blockchainTransaction'])
+            ->latest()
+            ->get()
+            ->map(function ($donation) {
+                return [
+                    'id' => 'donation-' . $donation->id,
+                    'type' => 'donation',
+                    'direction' => 'in',
+                    'title' => 'Donation to ' . ($donation->campaign->fundingRequest->title ?? 'campaign'),
+                    'amount' => (float) $donation->amount,
+                    'currency' => $donation->currency,
+                    'status' => $donation->status->value,
+                    'counterparty' => $donation->donor?->name ?? 'Anonymous Donor',
+                    'tx_hash' => $donation->blockchainTransaction?->tx_hash,
+                    'timestamp' => $donation->created_at,
+                ];
+            });
+
+        $disbursements = $student->disbursements()
+            ->with(['school', 'milestone', 'blockchainTransaction'])
+            ->latest()
+            ->get()
+            ->map(function ($disbursement) {
+                return [
+                    'id' => 'disbursement-' . $disbursement->id,
+                    'type' => 'disbursement',
+                    'direction' => 'in',
+                    'title' => 'Fund release: ' . ($disbursement->milestone->title ?? 'milestone'),
+                    'amount' => (float) $disbursement->amount,
+                    'currency' => $disbursement->currency,
+                    'status' => $disbursement->status->value,
+                    'counterparty' => $disbursement->school->name ?? 'School',
+                    'tx_hash' => $disbursement->tx_hash,
+                    'timestamp' => $disbursement->released_at ?? $disbursement->created_at,
+                ];
+            });
+
+        return $donations->merge($disbursements)
+            ->sortByDesc('timestamp')
+            ->values();
+    }
+
     public function getNotificationCount(StudentProfile $student): int
     {
         return 0; // Dummy value
     }
-    
+
     public function getCurrentMilestone(StudentProfile $student): ?object
     {
         return null; // Dummy value

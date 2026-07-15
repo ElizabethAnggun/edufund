@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'stellar' => [
+        'horizon_url' => env('STELLAR_HORIZON_URL', 'https://horizon-testnet.stellar.org'),
+        'network_passphrase' => env('STELLAR_NETWORK_PASSPHRASE', 'Test SDF Network ; September 2015'),
+        'escrow_account' => env('STELLAR_ESCROW_ACCOUNT', ''),
+        'signer_secret' => env('STELLAR_SIGNER_SECRET', ''),
+
+        // Soroban / Stellar 3.0 RPC Configuration
+        'rpc_url' => env('STELLAR_RPC_URL', 'https://soroban-testnet.stellar.org'),
+        'soroban_network_passphrase' => env('STELLAR_NETWORK_PASSPHRASE', 'Test SDF Network ; September 2015'),
+
+        // Escrow Smart Contract (deployed on Soroban)
+        'escrow_contract_id' => env('STELLAR_ESCROW_CONTRACT_ID', ''),
+    ],
+
 ];

@@ -40,7 +40,7 @@ class DonationService implements DonationServiceInterface
                 'transactionable_id' => $donation->id,
                 'transactionable_type' => Donation::class,
                 'user_id' => $donor->id,
-                'tx_hash' => 'pending_' . $donation->id,
+                'tx_hash' => null,
                 'type' => BlockchainTransactionType::DONATION,
                 'amount' => $data['amount'],
                 'currency' => $data['currency'] ?? 'XLM',

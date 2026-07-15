@@ -34,6 +34,7 @@ class SchoolSeeder extends Seeder
                 'phone' => '021-1234567',
                 'email' => 'school1@edufund.test',
                 'accreditation_number' => 'AKR-001-2024',
+                'stellar_wallet_address' => 'GAXSCHOOLONEEDUFUNDTESTNETWALLETADDRESS0000000000000000001',
                 'verification_status' => SchoolVerificationStatus::VERIFIED->value,
                 'verified_at' => now(),
             ]

@@ -2,6 +2,7 @@
 
 namespace App\Contracts\Services;
 
+use App\Models\Campaign;
 use App\Models\FundingRequest;
 use App\Models\StudentProfile;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,4 +16,5 @@ interface FundingRequestServiceInterface
     public function submit(FundingRequest $request): FundingRequest;
     public function approve(FundingRequest $request): FundingRequest;
     public function reject(FundingRequest $request, string $reason): FundingRequest;
+    public function createCampaignForRequest(FundingRequest $request): Campaign;
 }

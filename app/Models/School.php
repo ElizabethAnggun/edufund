@@ -72,6 +72,11 @@ class School extends Model
         return $this->hasMany(Campaign::class);
     }
 
+    public function disbursements(): HasMany
+    {
+        return $this->hasMany(Disbursement::class);
+    }
+
     public function verifications(): MorphMany
     {
         return $this->morphMany(Verification::class, 'verifiable');

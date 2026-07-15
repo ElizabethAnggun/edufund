@@ -74,19 +74,25 @@ class DashboardController extends Controller
 
     public function wallet(): View
     {
+        $student = auth()->user()->studentProfile;
         $user = auth()->user();
+
         $wallet = [
-            'address' => 'GDET7Q23J45H...', // Dummy address
-            'balance' => 0, // Dummy balance
+            'address' => $user->wallet_address ?? 'Not linked',
+            'balance' => $student ? $this->dashboardService->getWalletBalance($student) : 0,
             'network' => 'Stellar',
         ];
-        $transactions = collect(); // Dummy transactions
-        return view('student.wallet', compact('wallet', 'transactions'));
+
+        $disbursements = $student ? $student->disbursements()->with(['school', 'milestone'])->latest()->get() : collect();
+
+        return view('student.wallet', compact('wallet', 'disbursements'));
     }
 
     public function transactions(): View
     {
-        $transactions = collect(); // Dummy transactions
+        $student = auth()->user()->studentProfile;
+        $transactions = $student ? $this->dashboardService->getTransactions($student) : collect();
+
         return view('student.transactions', compact('transactions'));
     }
 

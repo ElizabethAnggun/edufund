@@ -18,11 +18,13 @@ use App\Contracts\Services\UserServiceInterface;
 use App\Services\AdminDashboardService;
 use App\Services\AuthService;
 use App\Services\DonationService;
+use App\Services\DisbursementService;
 use App\Services\DonorDashboardService;
 use App\Services\FundingRequestService;
 use App\Services\MilestoneService;
 use App\Services\SchoolDashboardService;
 use App\Services\SchoolProfileService;
+use App\Services\SorobanService;
 use App\Services\StellarService;
 use App\Services\StudentDashboardService;
 use App\Services\StudentProfileService;
@@ -50,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StellarServiceInterface::class, StellarService::class);
         $this->app->bind(AdminDashboardServiceInterface::class, AdminDashboardService::class);
         $this->app->bind(DonationServiceInterface::class, DonationService::class);
+        $this->app->bind(\App\Contracts\Services\DisbursementServiceInterface::class, \App\Services\DisbursementService::class);
     }
 
     /**

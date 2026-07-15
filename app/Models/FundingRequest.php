@@ -23,11 +23,11 @@ class FundingRequest extends Model
         'total_amount',
         'currency',
         'deadline',
-        'funding_category',
+        'category',
         'purpose',
         'status',
         'submitted_at',
-        'approved_at',
+        'school_approved_at',
         'rejected_at',
         'rejection_reason',
     ];
@@ -37,10 +37,10 @@ class FundingRequest extends Model
         return [
             'total_amount' => 'decimal:2',
             'status' => FundingRequestStatus::class,
-            'funding_category' => FundingCategory::class,
+            'category' => FundingCategory::class,
             'deadline' => 'date',
             'submitted_at' => 'datetime',
-            'approved_at' => 'datetime',
+            'school_approved_at' => 'datetime',
             'rejected_at' => 'datetime',
         ];
     }
@@ -68,5 +68,10 @@ class FundingRequest extends Model
     public function supportingDocuments(): HasMany
     {
         return $this->hasMany(SupportingDocument::class);
+    }
+
+    public function disbursements(): HasMany
+    {
+        return $this->hasMany(Disbursement::class);
     }
 }

@@ -37,7 +37,7 @@ class FundingRequestController extends Controller
     {
         $this->authorize('view', $fundingRequest);
         
-        $fundingRequest->load('studentProfile.user', 'school', 'supportingDocuments');
+        $fundingRequest->load('studentProfile.user', 'school', 'supportingDocuments', 'campaign', 'milestones.disbursement', 'disbursements');
 
         return view('school.funding-requests.show', compact('fundingRequest'));
     }

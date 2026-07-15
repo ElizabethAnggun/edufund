@@ -24,7 +24,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-neutral-500">Category</p>
-                    <p class="text-xl font-semibold text-neutral-900">{{ ucwords(str_replace('_', ' ', $fundingRequest->funding_category->value)) }}</p>
+                    <p class="text-xl font-semibold text-neutral-900">{{ ucwords(str_replace('_', ' ', $fundingRequest->category->value)) }}</p>
                 </div>
             </div>
 

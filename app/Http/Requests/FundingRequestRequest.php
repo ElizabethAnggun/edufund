@@ -28,7 +28,7 @@ class FundingRequestRequest extends FormRequest
             'description' => 'required|string',
             'total_amount' => 'required|numeric|min:0',
             'deadline' => 'required|date|after:today',
-            'funding_category' => ['required', new Enum(FundingCategory::class)],
+            'category' => ['required', new Enum(FundingCategory::class)],
         ];
     }
 }

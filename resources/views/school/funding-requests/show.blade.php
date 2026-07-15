@@ -48,6 +48,44 @@
             <p class="text-neutral-600 leading-relaxed">{{ $fundingRequest->description }}</p>
         </div>
 
+        @if(in_array($fundingRequest->status, [\App\Enums\FundingRequestStatus::APPROVED, \App\Enums\FundingRequestStatus::ACTIVE, \App\Enums\FundingRequestStatus::COMPLETED]))
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-neutral-900">Milestones & Disbursements</h3>
+                    <a href="{{ route('school.disbursements.create', $fundingRequest) }}" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-full transition-all btn-press">
+                        Release Funds
+                    </a>
+                </div>
+
+                @if($fundingRequest->milestones->isEmpty())
+                    <p class="text-neutral-500 text-sm">No milestones yet for this request.</p>
+                @else
+                    <div class="space-y-3">
+                        @foreach($fundingRequest->milestones as $milestone)
+                            <div class="bg-background p-4 rounded-xl flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-neutral-900">{{ $milestone->title }}</p>
+                                    <p class="text-sm text-neutral-500">
+                                        ${{ number_format($milestone->amount, 2) }}
+                                        &middot; {{ ucwords(str_replace('_', ' ', $milestone->status->value)) }}
+                                    </p>
+                                </div>
+                                @if($milestone->disbursement)
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Disbursed ${{ number_format($milestone->disbursement->amount, 2) }}
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">
+                                        Not yet disbursed
+                                    </span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        @endif
+
         @if($fundingRequest->status === \App\Enums\FundingRequestStatus::PENDING_SCHOOL_APPROVAL)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-background p-5 rounded-xl">

@@ -14,12 +14,17 @@ class DashboardController extends Controller
         private readonly SchoolDashboardServiceInterface $dashboardService
     ) {}
 
-    public function index(): View|RedirectResponse
+    public function index(): View
     {
         $school = auth()->user()->school;
         
         if (!$school) {
-            return redirect()->route('school.profile')->with('warning', 'Please complete your school profile first.');
+            return view('school.dashboard', [
+                'school' => null,
+                'stats' => [],
+                'recentFundingRequests' => collect(),
+                'recentActivities' => collect(),
+            ]);
         }
 
         $stats = $this->dashboardService->getStatistics($school);
