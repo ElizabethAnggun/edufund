@@ -49,5 +49,7 @@
             <p>&copy; {{ date('Y') }} EduFund Inc. All rights reserved.</p>
         </footer>
     </div>
+
+    @stack('scripts')
 </body>
 </html>

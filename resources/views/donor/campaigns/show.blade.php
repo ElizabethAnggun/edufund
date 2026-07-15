@@ -20,7 +20,7 @@
                         <p class="text-neutral-500">by {{ $campaign->fundingRequest->studentProfile->user->name ?? 'Student' }}</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary-soft text-primary">
-                        Active
+                        {{ ucfirst($campaign->status->value ?? $campaign->status) }}
                     </span>
                 </div>
 
@@ -31,8 +31,8 @@
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-neutral-900 mb-3">Funding Goal</h3>
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-2xl font-bold text-primary">${{ number_format($campaign->current_amount, 2) }}</span>
-                        <span class="text-neutral-600">of ${{ number_format($campaign->goal_amount, 2) }}</span>
+                        <span class="text-2xl font-bold text-primary">{{ number_format($campaign->current_amount, 7) }} XLM</span>
+                        <span class="text-neutral-600">of {{ number_format($campaign->goal_amount, 7) }} XLM</span>
                     </div>
                     <div class="w-full bg-neutral-200 rounded-full h-3 mb-2">
                         <div class="bg-gradient-to-r from-primary to-primary-hover h-3 rounded-full" style="width: {{ $campaign->goal_amount > 0 ? min(($campaign->current_amount / $campaign->goal_amount) * 100, 100) : 0 }}%"></div>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="bg-background p-4 rounded-xl">
                         <p class="text-sm text-neutral-500 mb-1">Days Left</p>
-                        <p class="text-xl font-bold text-neutral-900">{{ $campaign->end_date ? max(0, now()->diffInDays($campaign->end_date)) : 'N/A' }}</p>
+                        <p class="text-xl font-bold text-neutral-900">{{ $campaign->ends_at ? max(0, now()->diffInDays($campaign->ends_at)) : 'N/A' }}</p>
                     </div>
                 </div>
             </div>
@@ -68,33 +68,56 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Milestones -->
+            @if($campaign->milestones->count() > 0)
+                <div class="bg-surface p-8 rounded-xl border border-neutral-200">
+                    <h3 class="text-xl font-semibold text-neutral-900 mb-4">Milestones</h3>
+                    <div class="space-y-4">
+                        @foreach($campaign->milestones as $milestone)
+                            <div class="flex items-center justify-between p-4 bg-background rounded-xl">
+                                <div>
+                                    <p class="font-semibold text-neutral-900">{{ $milestone->title }}</p>
+                                    <p class="text-sm text-neutral-500">{{ number_format($milestone->amount, 7) }} XLM</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium
+                                    @if($milestone->status->value === 'completed') bg-green-100 text-green-800
+                                    @elseif($milestone->status->value === 'approved') bg-blue-100 text-blue-800
+                                    @else bg-yellow-100 text-yellow-800 @endif">
+                                    {{ ucfirst($milestone->status->value) }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Sidebar - Donation Form -->
         <div class="lg:col-span-1">
             <div class="bg-surface p-6 rounded-xl border border-neutral-200 sticky top-6">
                 <h3 class="text-xl font-semibold text-neutral-900 mb-4">Make a Donation</h3>
-                
-                <form action="{{ route('donor.donations.store', $campaign) }}" method="POST">
-                    @csrf
-                    <div class="mb-4">
-                        <label class="block text-neutral-700 text-sm font-medium mb-2">Donation Amount (USD)</label>
-                        <input type="number" name="amount" step="0.01" min="1" required
-                               class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                               placeholder="100.00">
-                    </div>
 
-                    <div class="mb-6">
-                        <label class="block text-neutral-700 text-sm font-medium mb-2">Message (Optional)</label>
-                        <textarea name="message" rows="3"
-                                  class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none"
-                                  placeholder="Write an encouraging message..."></textarea>
-                    </div>
+                <a href="{{ route('donor.campaigns.donate', $campaign) }}" class="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-active text-white font-semibold py-3 px-4 rounded-full transition-all btn-press shadow-lg hover:shadow-xl text-center block mb-3">
+                    Donate Now
+                </a>
 
-                    <button type="submit" class="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-active text-white font-semibold py-3 px-4 rounded-full transition-all btn-press shadow-lg hover:shadow-xl">
-                        Donate Now
-                    </button>
-                </form>
+                @if($isSaved)
+                    <form action="{{ route('donor.campaigns.unsave', $campaign) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 py-2.5 rounded-full text-sm font-medium transition-all">
+                            Remove from Saved
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('donor.campaigns.save', $campaign) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 py-2.5 rounded-full text-sm font-medium transition-all">
+                            Save Campaign
+                        </button>
+                    </form>
+                @endif
 
                 <div class="mt-6 p-4 bg-primary-soft rounded-xl">
                     <p class="text-sm text-neutral-700">

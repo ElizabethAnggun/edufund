@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->hasOne(StudentProfile::class);
     }
 
+    public function savedCampaigns(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Campaign::class, 'saved_campaigns')->withTimestamps();
+    }
+
     public function school(): HasOne
     {
         return $this->hasOne(School::class);

@@ -2,20 +2,24 @@
 
 namespace App\Providers;
 
+use App\Contracts\Services\AdminDashboardServiceInterface;
 use App\Contracts\Services\AuthServiceInterface;
 use App\Contracts\Services\DonorDashboardServiceInterface;
 use App\Contracts\Services\FundingRequestServiceInterface;
 use App\Contracts\Services\MilestoneServiceInterface;
 use App\Contracts\Services\SchoolDashboardServiceInterface;
+use App\Contracts\Services\StellarServiceInterface;
 use App\Contracts\Services\StudentDashboardServiceInterface;
 use App\Contracts\Services\StudentProfileServiceInterface;
 use App\Contracts\Services\SupportingDocumentServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
+use App\Services\AdminDashboardService;
 use App\Services\AuthService;
 use App\Services\DonorDashboardService;
 use App\Services\FundingRequestService;
 use App\Services\MilestoneService;
 use App\Services\SchoolDashboardService;
+use App\Services\StellarService;
 use App\Services\StudentDashboardService;
 use App\Services\StudentProfileService;
 use App\Services\SupportingDocumentService;
@@ -39,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SchoolDashboardServiceInterface::class, SchoolDashboardService::class);
         $this->app->bind(StudentDashboardServiceInterface::class, StudentDashboardService::class);
         $this->app->bind(MilestoneServiceInterface::class, MilestoneService::class);
+        $this->app->bind(StellarServiceInterface::class, StellarService::class);
+        $this->app->bind(AdminDashboardServiceInterface::class, AdminDashboardService::class);
+        $this->app->bind(DonationServiceInterface::class, DonationService::class);
     }
 
     /**
