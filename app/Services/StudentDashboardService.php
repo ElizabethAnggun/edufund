@@ -51,6 +51,36 @@ class StudentDashboardService implements StudentDashboardServiceInterface
         ];
     }
 
+    public function getMilestoneProgress(StudentProfile $student): array
+    {
+        $totalMilestones = $student->fundingRequests()
+            ->whereHas('campaign', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->with('milestones')
+            ->get()
+            ->sum(function ($request) {
+                return $request->milestones->count();
+            });
+
+        $completedMilestones = $student->milestoneSubmissions()
+            ->where('status', 'approved')
+            ->count();
+
+        $pendingMilestones = $student->milestoneSubmissions()
+            ->where('status', 'pending')
+            ->count();
+
+        $progressPercentage = $totalMilestones > 0 ? round(($completedMilestones / $totalMilestones) * 100, 2) : 0;
+
+        return [
+            'total_milestones' => $totalMilestones,
+            'completed_milestones' => $completedMilestones,
+            'pending_milestones' => $pendingMilestones,
+            'progress_percentage' => $progressPercentage,
+        ];
+    }
+
     public function getRecentFundingRequests(StudentProfile $student, int $limit = 5): Collection
     {
         return $student->fundingRequests()
@@ -117,36 +147,6 @@ class StudentDashboardService implements StudentDashboardServiceInterface
             ->values();
 
         return $activities;
-    }
-
-    public function getMilestoneProgress(StudentProfile $student): array
-    {
-        $totalMilestones = $student->fundingRequests()
-            ->whereHas('campaign', function ($query) {
-                $query->where('status', 'active');
-            })
-            ->with('milestones')
-            ->get()
-            ->sum(function ($request) {
-                return $request->milestones->count();
-            });
-
-        $completedMilestones = $student->milestoneSubmissions()
-            ->where('status', 'approved')
-            ->count();
-
-        $pendingMilestones = $student->milestoneSubmissions()
-            ->where('status', 'pending')
-            ->count();
-
-        $progressPercentage = $totalMilestones > 0 ? round(($completedMilestones / $totalMilestones) * 100, 2) : 0;
-
-        return [
-            'total_milestones' => $totalMilestones,
-            'completed_milestones' => $completedMilestones,
-            'pending_milestones' => $pendingMilestones,
-            'progress_percentage' => $progressPercentage,
-        ];
     }
 
     private function calculateProfileCompletion(StudentProfile $student): int

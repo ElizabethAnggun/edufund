@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
         $this->app->bind(StudentProfileServiceInterface::class, StudentProfileService::class);
+        $this->app->bind(StudentDashboardServiceInterface::class, StudentDashboardService::class);
         $this->app->bind(FundingRequestServiceInterface::class, FundingRequestService::class);
         $this->app->bind(SupportingDocumentServiceInterface::class, SupportingDocumentService::class);
         $this->app->bind(DonorDashboardServiceInterface::class, DonorDashboardService::class);
