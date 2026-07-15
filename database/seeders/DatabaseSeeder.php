@@ -21,9 +21,12 @@ class DatabaseSeeder extends Seeder
             SchoolSeeder::class,
             StudentSeeder::class,
             DonorSeeder::class,
+            VerificationSeeder::class,
             FundingRequestSeeder::class,
             CampaignSeeder::class,
             MilestoneSeeder::class,
+            MilestoneSubmissionSeeder::class,
+            AchievementSeeder::class,
             DonationSeeder::class,
             DisbursementSeeder::class,
         ]);

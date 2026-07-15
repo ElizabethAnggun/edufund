@@ -23,6 +23,14 @@ class FundingRequestController extends Controller
     public function index(): View
     {
         $student = auth()->user()->studentProfile;
+        
+        if (!$student) {
+            return view('student.funding-requests.index', [
+                'fundingRequests' => collect(),
+                'error' => 'Student profile not found. Please complete your profile first.'
+            ]);
+        }
+        
         $fundingRequests = $this->fundingRequestService->getAllByStudent($student);
 
         return view('student.funding-requests.index', compact('fundingRequests'));
@@ -36,6 +44,12 @@ class FundingRequestController extends Controller
     public function store(FundingRequestRequest $request): RedirectResponse
     {
         $student = auth()->user()->studentProfile;
+        
+        if (!$student) {
+            return redirect()->route('student.profile')
+                ->with('error', 'Please complete your student profile first before creating a funding request.');
+        }
+        
         $fundingRequest = $this->fundingRequestService->create($student, $request->validated());
 
         return redirect()->route('student.funding-requests.show', $fundingRequest)
@@ -101,6 +115,7 @@ class FundingRequestController extends Controller
     {
         $student = auth()->user()->studentProfile;
         $documents = collect();
+        
         if ($student) {
             $fundingRequests = $this->fundingRequestService->getAllByStudent($student);
             foreach ($fundingRequests as $request) {
@@ -108,6 +123,7 @@ class FundingRequestController extends Controller
                 $documents = $documents->merge($requestDocuments);
             }
         }
+        
         return view('student.documents', compact('documents'));
     }
 

@@ -15,10 +15,10 @@ class FundingRequestSeeder extends Seeder
 {
     public function run(): void
     {
-        $school = School::first();
+        $schools = School::all();
         $students = StudentProfile::all();
 
-        if ($students->isEmpty()) {
+        if ($students->isEmpty() || $schools->isEmpty()) {
             return;
         }
 
@@ -123,11 +123,11 @@ class FundingRequestSeeder extends Seeder
                         'title' => $titles[$titleIndex] . ' - ' . $major,
                     ],
                     [
-                        'school_id' => $school->id,
+                        'school_id' => $student->school_id ?? $schools->first()->id,
                         'description' => $descriptions[$titleIndex] . ' Mahasiswa sedang menempuh pendidikan di jurusan ' . $major . ' semester ' . $semester . '.',
                         'purpose' => $purposes[$titleIndex],
                         'total_amount' => $amount,
-                        'currency' => 'USD',
+                        'currency' => 'IDR',
                         'education_level' => $educationLevel,
                         'category' => $category,
                         'status' => $status,

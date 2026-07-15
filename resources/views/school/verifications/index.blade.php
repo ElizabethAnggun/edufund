@@ -29,7 +29,8 @@
                                 <td class="py-4 pr-4 text-neutral-600">{{ $verification->milestone->fundingRequest->studentProfile->user->name ?? 'Unknown' }}</td>
                                 <td class="py-4 pr-4">
                                     @php
-                                        $statusClass = match($verification->status) {
+                                        $statusValue = $verification->status->value;
+                                        $statusClass = match($statusValue) {
                                             'approved' => 'bg-green-100 text-green-800',
                                             'rejected' => 'bg-red-100 text-red-800',
                                             'pending' => 'bg-yellow-100 text-yellow-800',
@@ -37,7 +38,7 @@
                                         };
                                     @endphp
                                     <span class="px-3 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
-                                        {{ ucfirst($verification->status) }}
+                                        {{ ucfirst($statusValue) }}
                                     </span>
                                 </td>
                                 <td class="py-4 pr-4 text-neutral-600">{{ $verification->created_at->format('M d, Y') }}</td>
